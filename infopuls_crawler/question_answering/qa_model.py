@@ -1,36 +1,30 @@
 from gensim.models import Word2Vec
 
 from sklearn.metrics.pairwise import cosine_similarity
-from infopuls_crawler.dao.storage import *
+from infopuls_crawler.dao.storage import Storage
+
 
 DAO = Storage()
 
 
-def get_best_match(question):
-    sentences = []
-    vectors = []
+def get_model():
+    model = Word2Vec.load('model')
 
-    for item in DAO.get_all():
-        sentences.append(item['text'])
-        vectors.append(item['text'].split())
-
-    return train_model(sentences, vectors, question)
+    return model
 
 
-def train_model(sentences, vectors, question):
-    # to handle non existing words from question
-    vectors.append(question.split())
-
-    model = Word2Vec(vectors, min_count=1)
+def get_answer(model, question):
+    model.build_vocab([question.split()], update=True)
 
     best_sentence = None
     score = 0
 
-    for sentence in sentences:
+    for item in DAO.get_all():
+        sentence = item['text']
         new_score = sum(sum(cosine_similarity(
                 model.wv[sentence.split()],
-                model.wv[question.split()])))
-        if new_score > 0.5 and new_score > score:
+                model.wv[question.split()])))/len(sentence)
+        if new_score > score:
             score = new_score
             best_sentence = sentence
 
@@ -38,5 +32,6 @@ def train_model(sentences, vectors, question):
 
 
 if __name__ == '__main__':
-    question = "marketing"
-    print(get_best_match(question))
+    question = "mobile app developers"
+    model = get_model()
+    print(get_answer(model, question))
