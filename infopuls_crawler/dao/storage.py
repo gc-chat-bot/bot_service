@@ -24,7 +24,7 @@ class Storage(object):
     def safe_from_dir(self, directory=TEXTS_DIRECTORY):
         """Load all documents from *.json files to Mongo"""
 
-        files = glob.glob(os.path.join(directory, "*.json"))
+        files = glob.glob(os.path.join(directory, "*.json$"))
         for file in files:
             self.save_from_file(file)
 
