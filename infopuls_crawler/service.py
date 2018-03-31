@@ -59,6 +59,7 @@ class FilterIrrelevant(Handler):
 
 class QuestionHandler(Handler):
 
+    remove_questions = ""
     def handle(self, input):
         text = input.text
 
