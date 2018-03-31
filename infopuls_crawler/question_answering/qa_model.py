@@ -1,32 +1,31 @@
 from gensim.models import Word2Vec
 
-from pymongo import MongoClient
 from sklearn.metrics.pairwise import cosine_similarity
+from infopuls_crawler.dao.storage import *
+
+DAO = Storage()
 
 
-DATABASE = 'scrapper_db'
-COLLECTION = 'texts_collection'
-
-
-def get_sentences():
-    client = MongoClient('localhost', 27017)
-
-    db = client[DATABASE]
-    collection = db[COLLECTION]
+def get_best_match(question):
     sentences = []
     vectors = []
-    for item in list(collection.find()):
+
+    for item in DAO.get_all():
         sentences.append(item['text'])
         vectors.append(item['text'].split())
 
-    return sentences, vectors
+    return train_model(sentences, vectors, question)
 
 
 def train_model(sentences, vectors, question):
-    model = Word2Vec(vectors, min_count=1)
-    best_sentence = ''
+    # to handle non existing words from question
+    vectors.append(question.split())
 
+    model = Word2Vec(vectors, min_count=1)
+
+    best_sentence = None
     score = 0
+
     for sentence in sentences:
         new_score = sum(sum(cosine_similarity(
                 model.wv[sentence.split()],
@@ -35,11 +34,9 @@ def train_model(sentences, vectors, question):
             score = new_score
             best_sentence = sentence
 
-    print(best_sentence, score)
+    return best_sentence, score
 
 
 if __name__ == '__main__':
-    sentences, vectors = get_sentences()
-    question = 'mobile app developers'
-
-    train_model(sentences, vectors, question)
+    question = "marketing"
+    print(get_best_match(question))

@@ -1,15 +1,17 @@
 import json
 import os
-from pymongo import MongoClient
+import sys
 import glob
+from pymongo import MongoClient
+
+MONGO_CLIENT = MongoClient('localhost', 27017)
 
 DATABASE = "scrapper_db"
 COLLECTION = "texts_collection"
-TEXTS_DIRECTORY = os.path.join(os.path.abspath(os.path.join(os.getcwd(), "..", "..")), "texts")
 
 
 class Storage(object):
-    client = MongoClient('localhost', 27017)
+    client = MONGO_CLIENT
     db = client[DATABASE]
     collection = db[COLLECTION]
 
@@ -21,10 +23,10 @@ class Storage(object):
                 text = item["text"]
                 self.save(category, text)
 
-    def safe_from_dir(self, directory=TEXTS_DIRECTORY):
+    def safe_from_dir(self, directory):
         """Load all documents from *.json files to Mongo"""
 
-        files = glob.glob(os.path.join(directory, "*.json$"))
+        files = glob.glob(os.path.join(directory, "*.json"))
         for file in files:
             self.save_from_file(file)
 
@@ -49,19 +51,14 @@ class Storage(object):
         return self.collection.drop()
 
 
-# just for test
-def test():
-    dao = Storage()
+def main(argv):
+    texts_dir = os.path.join(argv)
 
-    # dao.clear()
-    # id1 = dao.save("cat1", "some text")
-    # id2 = dao.save("cat2", "some text")
-    # print(dao.get(id1))
-    # print(dao.get(id2))
-    # print(dao.get_all())
-    dao.safe_from_dir()
+    dao = Storage()
+    dao.clear()
+    dao.safe_from_dir(texts_dir)
     print(dao.get_all())
 
 
 if __name__ == "__main__":
-    test()
+    main(sys.argv[1])

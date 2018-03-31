@@ -73,3 +73,4 @@ webencodings==0.5.1
 widgetsnbextension==3.2.0
 zope.interface==4.4.3
 flask
+gensim
