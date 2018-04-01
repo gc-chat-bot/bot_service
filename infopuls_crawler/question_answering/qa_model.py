@@ -1,6 +1,8 @@
 from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
 import os
+from stop_words import get_stop_words
+
 from infopuls_crawler.dao.storage import Storage
 
 MODEL_FILE = os.path.join(os.path.abspath(os.path.join(os.path.abspath(__file__), "../../..")), "model")
@@ -12,17 +14,13 @@ def get_vectors():
     vectors = []
 
     for item in DAO.get_all():
-        vectors.append(item['text'].split())
+        vectors.append(item['text'].lower().split())
 
     return vectors
 
 
 def train_model(vectors):
-    # to handle non existing words from question
-    # vectors.append(question.split())
-
     model = Word2Vec(vectors, min_count=1)
-    # model.wv.save_word2vec_format('model')
     model.save(MODEL_FILE)
 
 
@@ -39,10 +37,12 @@ def get_answer(model, question):
     score = 0
 
     for item in DAO.get_all():
-        sentence = item['text'].lower()
+        sentence = item['text']
+        splitted_sentence = sentence.lower().split()
         new_score = sum(sum(cosine_similarity(
-                model.wv[sentence.lower().split()],
-                model.wv[question.lower().split()])))/(len(sentence))**(2/3)
+                model.wv[remove_stopwords(splitted_sentence)],
+                model.wv[remove_stopwords(question.lower().split())]))
+        )/(len(sentence))**(2/3)
         if new_score > score:
             score = new_score
             best_sentence = sentence
@@ -53,7 +53,13 @@ def get_answer(model, question):
     return best_sentence, score
 
 
+def remove_stopwords(word_list):
+    stop_words = list(get_stop_words('en'))
+
+    return [w for w in word_list if w not in stop_words]
+
+
 if __name__ == '__main__':
-    question = "APP developers"
+    question = "mobile app developers"
     model = get_model()
     print(get_answer(model, question))
