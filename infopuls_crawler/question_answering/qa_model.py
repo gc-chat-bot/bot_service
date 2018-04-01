@@ -1,6 +1,7 @@
+import numpy as np
 from gensim.models import Word2Vec
-
 from sklearn.metrics.pairwise import cosine_similarity
+
 from infopuls_crawler.dao.storage import Storage
 
 
@@ -23,15 +24,18 @@ def get_answer(model, question):
         sentence = item['text']
         new_score = sum(sum(cosine_similarity(
                 model.wv[sentence.split()],
-                model.wv[question.split()])))/len(sentence)
+                model.wv[question.split()])))/(len(sentence))**(2/3)
         if new_score > score:
             score = new_score
             best_sentence = sentence
+
+    if score < 0.1:
+        return 'Could you please rephrase the question?', score
 
     return best_sentence, score
 
 
 if __name__ == '__main__':
-    question = "mobile app developers"
+    question = "marketing specialists"
     model = get_model()
     print(get_answer(model, question))
