@@ -85,6 +85,7 @@ class QuestionHandler(Handler):
         user_questions = text
 
         best_sentence, score = get_answer(self.model, user_questions)
+        print("sentence: " + str(best_sentence) + ", score: " + str(score))
         if best_sentence is None:
             return None
         else:
@@ -104,11 +105,8 @@ def main():
     questions = "What is Infopulse? How many employees the company use?"
     sentences = questions.split()
 
-    sentences = [sentence for sentence in sentences]
-
     for sentence in sentences:
         print(sentence)
-    # sentence.replace(word, "", 1) if str(sentence).startswith(word) else sentence]
 
 
 if __name__ == "__main__":

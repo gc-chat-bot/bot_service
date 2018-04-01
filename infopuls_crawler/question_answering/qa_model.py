@@ -6,6 +6,7 @@ from stop_words import get_stop_words
 from stemming.porter2 import stem
 
 from infopuls_crawler.dao.storage import Storage
+from infopuls_crawler.util import normalize_word
 
 MODEL_FILE = os.path.join(os.path.abspath(os.path.join(os.path.abspath(__file__), "../../..")), "model")
 
@@ -33,7 +34,13 @@ def get_model():
 
 
 def get_answer(model, question):
-    question_words = remove_stopwords(question.lower().split())
+    question = question.lower().split()
+    question = list(map(lambda w: normalize_word(w), question))
+
+    for q in question:
+        print(q)
+
+    question_words = remove_stopwords(question)
     model.build_vocab([question_words], update=True)
 
     best_sentence = None
@@ -63,6 +70,6 @@ def remove_stopwords(word_list):
 
 
 if __name__ == '__main__':
-    question = "how many mobile developers do you have?"
+    question = "is EVRY’s Aplication Advantage"
     model = get_model()
     print(get_answer(model, question))

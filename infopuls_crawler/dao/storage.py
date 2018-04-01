@@ -51,14 +51,14 @@ class Storage(object):
         return self.collection.drop()
 
 
-def main(argv):
-    texts_dir = os.path.join(argv)
-
-    dao = Storage()
-    dao.clear()
-    dao.safe_from_dir(texts_dir)
-    print(dao.get_all())
-
-
-if __name__ == "__main__":
-    main(sys.argv[1])
+# def main(argv):
+#     texts_dir = os.path.join(argv)
+#
+#     dao = Storage()
+#     dao.clear()
+#     dao.safe_from_dir(texts_dir)
+#     print(dao.get_all())
+#
+#
+# if __name__ == "__main__":
+#     main(sys.argv[1])
