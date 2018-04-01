@@ -1,6 +1,7 @@
 from gensim.models import Word2Vec
 from infopuls_crawler.dao.storage import Storage
-
+import sys
+import os
 
 DAO = Storage()
 
@@ -24,6 +25,15 @@ def train_model(vectors):
 
 
 if __name__ == '__main__':
-    vectors = get_vectors()
 
+    texts_dir = os.path.join(sys.argv[1])
+
+    # upload data to Mongo
+    dao = Storage()
+    dao.clear()
+    dao.safe_from_dir(texts_dir)
+    print(dao.get_all())
+
+    # train model
+    vectors = get_vectors()
     train_model(vectors)

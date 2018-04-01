@@ -1,6 +1,6 @@
 import abc
 
-from infopuls_crawler.question_answering.qa_model import get_best_match, train_model
+from infopuls_crawler.question_answering.qa_model import get_model, get_answer
 
 
 class UserRequest(object):
@@ -60,13 +60,16 @@ class FilterIrrelevant(Handler):
 class QuestionHandler(Handler):
 
     remove_questions = ""
+
+    model = get_model()
+
     def handle(self, input):
         text = input.text
 
         # TODO extract more info from question
         user_question = text
 
-        best_sentence, score = get_best_match(user_question)
+        best_sentence, score = get_answer(self.model, user_question)
         if best_sentence is None:
             return None
         else:
