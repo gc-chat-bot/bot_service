@@ -10,7 +10,7 @@ def get_vectors():
     vectors = []
 
     for item in DAO.get_all():
-        vectors.append(item['text'].split())
+        vectors.append(item['text'].lower().split())
 
     return vectors
 

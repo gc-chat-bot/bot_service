@@ -1,4 +1,3 @@
-import numpy as np
 from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -21,10 +20,10 @@ def get_answer(model, question):
     score = 0
 
     for item in DAO.get_all():
-        sentence = item['text']
+        sentence = item['text'].lower()
         new_score = sum(sum(cosine_similarity(
-                model.wv[sentence.split()],
-                model.wv[question.split()])))/(len(sentence))**(2/3)
+                model.wv[sentence.lower().split()],
+                model.wv[question.lower().split()])))/(len(sentence))**(2/3)
         if new_score > score:
             score = new_score
             best_sentence = sentence
@@ -36,6 +35,6 @@ def get_answer(model, question):
 
 
 if __name__ == '__main__':
-    question = "marketing specialists"
+    question = "APP developers"
     model = get_model()
     print(get_answer(model, question))
