@@ -1,7 +1,9 @@
+import os
+
 from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
-import os
 from stop_words import get_stop_words
+from stemming.porter2 import stem
 
 from infopuls_crawler.dao.storage import Storage
 
@@ -14,7 +16,7 @@ def get_vectors():
     vectors = []
 
     for item in DAO.get_all():
-        vectors.append(item['text'].lower().split())
+        vectors.append(remove_stopwords(item['text'].lower().split()))
 
     return vectors
 
@@ -31,7 +33,8 @@ def get_model():
 
 
 def get_answer(model, question):
-    model.build_vocab([question.split()], update=True)
+    question_words = remove_stopwords(question.lower().split())
+    model.build_vocab([question_words], update=True)
 
     best_sentence = None
     score = 0
@@ -41,7 +44,7 @@ def get_answer(model, question):
         splitted_sentence = sentence.lower().split()
         new_score = sum(sum(cosine_similarity(
                 model.wv[remove_stopwords(splitted_sentence)],
-                model.wv[remove_stopwords(question.lower().split())]))
+                model.wv[question_words]))
         )/(len(sentence))**(2/3)
         if new_score > score:
             score = new_score
@@ -56,10 +59,10 @@ def get_answer(model, question):
 def remove_stopwords(word_list):
     stop_words = list(get_stop_words('en'))
 
-    return [w for w in word_list if w not in stop_words]
+    return [stem(w) for w in word_list if w not in stop_words]
 
 
 if __name__ == '__main__':
-    question = "mobile app developers"
+    question = "is EVRY’s Application Advantage"
     model = get_model()
     print(get_answer(model, question))
