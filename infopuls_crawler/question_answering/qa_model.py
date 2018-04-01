@@ -1,14 +1,33 @@
 from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
-
+import os
 from infopuls_crawler.dao.storage import Storage
 
+MODEL_FILE = os.path.join(os.path.abspath(os.path.join(os.path.abspath(__file__), "../../..")), "model")
 
 DAO = Storage()
 
 
+def get_vectors():
+    vectors = []
+
+    for item in DAO.get_all():
+        vectors.append(item['text'].split())
+
+    return vectors
+
+
+def train_model(vectors):
+    # to handle non existing words from question
+    # vectors.append(question.split())
+
+    model = Word2Vec(vectors, min_count=1)
+    # model.wv.save_word2vec_format('model')
+    model.save(MODEL_FILE)
+
+
 def get_model():
-    model = Word2Vec.load('model')
+    model = Word2Vec.load(MODEL_FILE)
 
     return model
 

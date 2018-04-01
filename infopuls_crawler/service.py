@@ -1,4 +1,6 @@
 import abc
+import nltk
+from re import *
 
 from infopuls_crawler.question_answering.qa_model import get_model, get_answer
 
@@ -48,7 +50,7 @@ class Handler(object):
 class FilterIrrelevant(Handler):
     # set of irrelevant question templates
     bad_questions = [
-        "fuck"
+        r"fuck"
     ]
 
     def handle(self, input):
@@ -59,17 +61,30 @@ class FilterIrrelevant(Handler):
 
 class QuestionHandler(Handler):
 
-    remove_questions = ""
-
     model = get_model()
+
+    question_words = [
+        "what ",
+        "what's",
+        "who",
+        "who's",
+        "where",
+        "where's",
+        "why ",
+        "why's "
+        "whom ",
+        "which ",
+        "how ",
+        "when "
+    ]
+
 
     def handle(self, input):
         text = input.text
 
-        # TODO extract more info from question
-        user_question = text
+        user_questions = text
 
-        best_sentence, score = get_answer(self.model, user_question)
+        best_sentence, score = get_answer(self.model, user_questions)
         if best_sentence is None:
             return None
         else:
@@ -85,6 +100,15 @@ def handlers():
 def main():
     handler = handlers()
     print(handler.process_request(UserRequest("chat1", "session1", "s fsdtext")).text)
+
+    questions = "What is Infopulse? How many employees the company use?"
+    sentences = questions.split()
+
+    sentences = [sentence for sentence in sentences]
+
+    for sentence in sentences:
+        print(sentence)
+    # sentence.replace(word, "", 1) if str(sentence).startswith(word) else sentence]
 
 
 if __name__ == "__main__":
