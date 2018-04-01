@@ -37,6 +37,9 @@ def get_answer(model, question):
         question.lower().replace('?', '').split())
     rephrase = 'Could you please rephrase the question?'
 
+    # fix spelling errors
+    question_words = list(map(lambda w: normalize_word(w), question_words))
+
     if not question_words:
         return rephrase, 0
 

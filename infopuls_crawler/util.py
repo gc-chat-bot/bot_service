@@ -7,7 +7,7 @@ def load_key_values(file):
     mapping = {}
     with open(file) as f:
         for line in f:
-            splitted = line.split(" ")
+            splitted = line.replace('\n', '').split(" ")
             k = str(splitted[0])
             v = str(splitted[1])
             mapping[k] = v
