@@ -45,12 +45,12 @@ def get_answer(model, question):
         new_score = sum(sum(cosine_similarity(
                 model.wv[remove_stopwords(splitted_sentence)],
                 model.wv[question_words]))
-        )/(len(sentence))**(2/3)
+        )/(len(splitted_sentence))**(2/3)
         if new_score > score:
             score = new_score
             best_sentence = sentence
 
-    if score < 0.1:
+    if score < 0.4:
         return 'Could you please rephrase the question?', score
 
     return best_sentence, score
@@ -63,6 +63,6 @@ def remove_stopwords(word_list):
 
 
 if __name__ == '__main__':
-    question = "is EVRY’s Application Advantage"
+    question = "how many mobile developers do you have?"
     model = get_model()
     print(get_answer(model, question))
