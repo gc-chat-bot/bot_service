@@ -35,6 +35,11 @@ def get_model():
 def get_answer(model, question):
     question_words = remove_stopwords(
         question.lower().replace('?', '').split())
+    rephrase = 'Could you please rephrase the question?'
+
+    if not question_words:
+        return rephrase, 0
+
     model.build_vocab([question_words], update=True)
 
     best_sentence = None
@@ -53,7 +58,7 @@ def get_answer(model, question):
             best_sentence = sentence
 
     if score < 0.4:
-        return 'Could you please rephrase the question?', score
+        return rephrase, score
 
     return best_sentence, score
 
@@ -65,6 +70,6 @@ def remove_stopwords(word_list):
 
 
 if __name__ == '__main__':
-    question = "What Application Operation provides?"
+    question = "how many mobile developers do you have?"
     model = get_model()
     print(get_answer(model, question))
