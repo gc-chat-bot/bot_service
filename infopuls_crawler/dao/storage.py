@@ -4,7 +4,7 @@ import sys
 import glob
 from pymongo import MongoClient
 
-MONGO_CLIENT = MongoClient('mongodb', 27017)
+MONGO_CLIENT = MongoClient('localhost', 27017)
 
 DATABASE = "scrapper_db"
 COLLECTION = "texts_collection"
